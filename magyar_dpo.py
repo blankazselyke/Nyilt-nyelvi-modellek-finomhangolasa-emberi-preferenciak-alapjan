@@ -5,6 +5,7 @@ import gc
 import torch
 import transformers
 import pandas as pd
+import wandb
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -19,6 +20,7 @@ from peft import (
     prepare_model_for_kbit_training
 )
 from trl import DPOTrainer, DPOConfig setup_chat_format
+from sklearn.model_selection import train_test_split
 
 
 base_model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -100,13 +102,13 @@ model.train()
 for param in model.parameters():
     param.requires_grad = True
 
-import wandb
+
 wandb.login()
 
-from sklearn.model_selection import train_test_split
+
 df = dataset.to_pandas()
 
-train_df, test_df = train_test_split(df, test_size=0.2)
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
 train_dataset = dataset.from_pandas(train_df)
 test_dataset = dataset.from_pandas(test_df)
